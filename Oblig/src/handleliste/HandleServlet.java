@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.text.*;
 
 
 @WebServlet(name = "handle", urlPatterns = { "/handle" })
@@ -19,19 +20,7 @@ public class HandleServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 				
 		
-		String handling = (String) request.getSession().getAttribute("handling");
-		String vare = (String) request.getSession().getAttribute("vare");	
-		
-		System.out.println(handling + " " +vare);
-		
-		if (handling != null && vare != null) {
-		
-		if (handling.equals("Legg til")) {
-			handleliste.addItem(vare);
-		} else if (handling.equals("Slett")) {
-			handleliste.slettItem(vare);
-		}}
-		
+
 		
         List<String> strings = handleliste.getItems();	
 		
@@ -48,15 +37,17 @@ public class HandleServlet extends HttpServlet {
         out.println("<body>");
         out.println("<h1> Min handleliste </h1>");
         out.println("<form action=\"" + "handle" + "\" method=\"post\">");
-        out.println("<p><input type=\"submit\" value=\"Legg til\" /> Legg til vare: <input type=\"text\" name=\"vare\" /><input type=\"hidden\" name=\"handling\"</p>");
+        out.println("<p><input type=\"submit\" value=\"Legg til\" /> Legg til vare: <input type=\"text\" name=\"vare\" /></p>");
+        out.println("<input type=\"hidden\" id=\"itemid\" name=\"handling\" value=" + "Legg" +">");
         out.println("</form>");
         
         if (strings != null) {
         
         for (String s : strings) {
         	out.println("<form action=\"" + "handle" + "\" method=\"post\">");
-        	out.println("<input type=\"submit\" value=\"Slett\" />");
-        	out.println("<input type=\"hidden\" name=\"handling\" />");
+        	out.println("<input type=\"submit\" value=\"Slett\" />"); 
+        	out.println("<input type=\"hidden\" id=\"itemid\" name=\"handling\" value=" + "Slett" +">");
+        	out.println("<input type=\"hidden\" id=\"itemid\" name=\"vare\" value=" + s +">");
         	out.println(s + "</br></br>");
         	out.println("</form>");
         }
@@ -78,9 +69,28 @@ public class HandleServlet extends HttpServlet {
 		
 		
 		String input = request.getParameter("handling");	
-		String vare = request.getParameter("vare");
+		String item = request.getParameter("vare");
+		
 		request.getSession().setAttribute("handling", input);	
-		request.getSession().setAttribute("vare", vare);
+		request.getSession().setAttribute("vare", item);
+		
+		String handling = (String) request.getSession().getAttribute("handling");
+		String escvare = (String) request.getSession().getAttribute("vare");	
+		
+		String vare = org.apache.commons.text.StringEscapeUtils.escapeHtml4(escvare);
+		
+		System.out.println(handling + " " +vare);
+		
+		if (!vare.equals("")) {
+		
+		if (handling.equals("Legg")) {
+			handleliste.addItem(vare);
+		} else if (handling.equals("Slett")) {
+			handleliste.slettItem(vare);
+		}
+
+		}
+		
 		response.sendRedirect("handle");
 		
 		
