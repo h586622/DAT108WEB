@@ -28,6 +28,8 @@ public class HandleListe {
 	public void setItems(List<String> items) {
 		this.items = items;
 	}
-    
-
+	
+	public boolean finnes(String navn) {		
+		return (items.contains(navn)) ;	
+	}
 }

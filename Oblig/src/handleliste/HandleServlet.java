@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import org.apache.commons.text.*;
 public class HandleServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;	
 	private HandleListe handleliste = new HandleListe();
+	private Cookie cookie;
 	
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -67,6 +69,11 @@ public class HandleServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		
+		if (cookie == null) {  // sjekker om det finnes cookie, legger til om ikke
+			cookie = new Cookie("innlogget", "");
+			cookie.setMaxAge(3600);  // en time
+			response.addCookie(cookie);
+		}
 		
 		String input = request.getParameter("handling");	
 		String item = request.getParameter("vare");
@@ -77,13 +84,13 @@ public class HandleServlet extends HttpServlet {
 		String handling = (String) request.getSession().getAttribute("handling");
 		String escvare = (String) request.getSession().getAttribute("vare");	
 		
-		String vare = org.apache.commons.text.StringEscapeUtils.escapeHtml4(escvare);
+		String vare = org.apache.commons.text.StringEscapeUtils.escapeHtml4(escvare); // ufarliggjør input
 		
-		System.out.println(handling + " " +vare);
+		System.out.println(handling + " " +vare);  // skriver til konsoll for testing
 		
-		if (!vare.equals("")) {
+		if (!vare.equals("")) {  // håndterer nullverdi
 		
-		if (handling.equals("Legg")) {
+		if (handling.equals("Legg") && !handleliste.finnes(vare)) {
 			handleliste.addItem(vare);
 		} else if (handling.equals("Slett")) {
 			handleliste.slettItem(vare);
