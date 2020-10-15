@@ -13,7 +13,7 @@ public class HandleListe {
     	this.items = new ArrayList<>();
     }
     
-    public void addItem(String item) {
+    public synchronized void addItem(String item) {
         items.add(item);
     }
     
@@ -21,7 +21,7 @@ public class HandleListe {
         return items;
     }
     
-    public void slettItem(String navn) {
+    public synchronized void slettItem(String navn) {
     	items = items.stream().filter(s -> !s.equals(navn)).collect(Collectors.toList());
     }
 
@@ -29,7 +29,7 @@ public class HandleListe {
 		this.items = items;
 	}
 	
-	public boolean finnes(String navn) {		
+	public synchronized boolean finnes(String navn) {		
 		return (items.contains(navn)) ;	
 	}
 }
